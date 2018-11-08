@@ -1,7 +1,7 @@
 <resources>
     <declare-styleable name="TagGroup">
         <!-- Whether the tag group is in append mode. -->
-        <attr name="atg_isAppendMode" format="boolean" />
+        <attr name="atg_isAppendMode" format="integer" />
         <!-- If the tag group is in append mode, what the hint of input tag. -->
         <attr name="atg_inputHint" format="string" />
 

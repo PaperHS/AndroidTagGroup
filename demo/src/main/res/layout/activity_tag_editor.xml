@@ -14,5 +14,16 @@
     <me.gujun.android.taggroup.TagGroup
         android:id="@+id/tag_group"
         style="@style/TagGroup"
-        app:atg_isAppendMode="true"/>
+        app:atg_isAppendMode="2"/>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#222"
+        android:layout_margin="10dp"
+        />
+
+    <me.gujun.android.taggroup.TagGroup
+        android:id="@+id/tag_group1"
+        style="@style/TagGroup"
+        app:atg_isAppendMode="1"/>
 </LinearLayout>

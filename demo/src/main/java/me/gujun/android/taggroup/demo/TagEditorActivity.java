@@ -11,6 +11,7 @@ import me.gujun.android.taggroup.demo.db.TagsManager;
 
 public class TagEditorActivity extends AppCompatActivity {
     private TagGroup mTagGroup;
+    private TagGroup mTagGroup1;
     private TagsManager mTagsManager;
 
     @Override
@@ -22,7 +23,9 @@ public class TagEditorActivity extends AppCompatActivity {
         String[] tags = mTagsManager.getTags();
 
         mTagGroup = (TagGroup) findViewById(R.id.tag_group);
-        mTagGroup.setTags(tags);
+        mTagGroup.setTags("a","ccc","123123","sdfsafdkkk","ccc","123123","sdfsafdkkk","ccc","123123","sdfsafdkkk","ccc","123123","sdfsafdkkk","ccc","123123","sdfsafdkkk");
+        mTagGroup1 = (TagGroup) findViewById(R.id.tag_group1);
+        mTagGroup1.setTags("a","ccc","123123","sdfsafdkkk","ccc","123123","sdfsafdkkk","ccc","123123","sdfsafdkkk","ccc","123123","sdfsafdkkk","ccc","123123","sdfsafdkkk");
     }
 
     @Override
