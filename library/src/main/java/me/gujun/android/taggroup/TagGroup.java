@@ -430,6 +430,35 @@ public class TagGroup extends ViewGroup {
         return tagList.toArray(new String[tagList.size()]);
     }
 
+    public List<String> getTagList() {
+        final int count = getChildCount();
+        final List<String> tagList = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            final TagView tagView = getTagAt(i);
+            if (tagView.mState == TagView.STATE_NORMAL) {
+                tagList.add(tagView.getText().toString());
+            }
+        }
+
+        return tagList;
+    }
+
+    /**
+     * set checked status of all tags()
+     * who do not contains by list will be uncheck
+     */
+
+    public void setTagCheckedInit(List<String> list){
+        final int count = getChildCount();
+        for (int i = 0; i < count; i++) {
+            final TagView tagView = getTagAt(i);
+            if (list.contains(tagView.getText().toString().trim())){
+                tagView.setChecked(true);
+            }else tagView.setChecked(false);
+        }
+    }
+
+
     /**
      * @see #setTags(String...)
      */
@@ -709,8 +738,10 @@ public class TagGroup extends ViewGroup {
                     }
                 }
             } else if (isAppendMode == 2) {
-                tag.setChecked(!tag.isChecked);
-                if (mOnTagChangeListener != null) {
+                if (mOnTagClickListener != null) {
+                    mOnTagClickListener.onTagClick(tag.getText().toString());
+                }else if (mOnTagChangeListener != null) {
+                    tag.setChecked(!tag.isChecked);
                     mOnTagChangeListener.onTagChecked(tag.isChecked, tag.getText().toString());
                 }
             } else {
@@ -924,7 +955,7 @@ public class TagGroup extends ViewGroup {
             // Make the checked mark drawing region.
             setPadding(horizontalPadding,
                     verticalPadding,
-                    (isChecked && isAppendMode == 1)? (int) (horizontalPadding + getHeight() / 2.5f + CHECKED_MARKER_OFFSET)
+                    (isChecked && isAppendMode == 1) ? (int) (horizontalPadding + getHeight() / 2.5f + CHECKED_MARKER_OFFSET)
                             : horizontalPadding,
                     verticalPadding);
             invalidatePaint();
@@ -1003,7 +1034,7 @@ public class TagGroup extends ViewGroup {
 
             if (isChecked && isAppendMode == 1) {
                 canvas.save();
-                canvas.translate(0,5);
+                canvas.translate(0, 5);
                 canvas.rotate(45, mCheckedMarkerBound.centerX(), mCheckedMarkerBound.centerY());
                 canvas.drawLine(mCheckedMarkerBound.left, mCheckedMarkerBound.centerY(),
                         mCheckedMarkerBound.right, mCheckedMarkerBound.centerY(), mCheckedMarkerPaint);
