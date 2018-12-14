@@ -174,6 +174,11 @@ public class TagGroup extends ViewGroup {
     private OnTagClickListener mOnTagClickListener;
 
     /**
+     * Max Size
+     */
+    private int MaxTagSize = 0;
+
+    /**
      * Listener used to handle tag click event.
      */
     private InternalTagClickListener mInternalTagClickListener = new InternalTagClickListener();
@@ -236,6 +241,14 @@ public class TagGroup extends ViewGroup {
 
     }
 
+    public int getMaxTagSize() {
+        return MaxTagSize;
+    }
+
+    public void setMaxTagSize(int maxTagSize) {
+        MaxTagSize = maxTagSize;
+    }
+
     /**
      * Call this to submit the INPUT tag.
      */
@@ -247,6 +260,7 @@ public class TagGroup extends ViewGroup {
             if (mOnTagChangeListener != null) {
                 mOnTagChangeListener.onAppend(TagGroup.this, inputTag.getText().toString());
             }
+
             appendInputTag();
         }
     }
@@ -531,10 +545,13 @@ public class TagGroup extends ViewGroup {
         mOnTagChangeListener = l;
     }
 
+
+
+
     /**
      * @see #appendInputTag(String)
      */
-    protected void appendInputTag() {
+    public void appendInputTag() {
         appendInputTag(null);
     }
 
@@ -544,14 +561,19 @@ public class TagGroup extends ViewGroup {
      * @param tag the tag text.
      */
     protected void appendInputTag(String tag) {
-        final TagView previousInputTag = getInputTag();
-        if (previousInputTag != null) {
-            throw new IllegalStateException("Already has a INPUT tag in group.");
+        if (MaxTagSize == 0 || getTagList().size() < MaxTagSize ){
+            final TagView previousInputTag = getInputTag();
+            if (previousInputTag != null) {
+                throw new IllegalStateException("Already has a INPUT tag in group.");
+            }
+
+            final TagView newInputTag = new TagView(getContext(), TagView.STATE_INPUT, tag);
+            newInputTag.setOnClickListener(mInternalTagClickListener);
+            newInputTag.addTextChangedListener(inputTextWatcher);
+            addView(newInputTag);
+
         }
 
-        final TagView newInputTag = new TagView(getContext(), TagView.STATE_INPUT, tag);
-        newInputTag.setOnClickListener(mInternalTagClickListener);
-        addView(newInputTag);
     }
 
     /**
@@ -563,6 +585,16 @@ public class TagGroup extends ViewGroup {
         final TagView newTag = new TagView(getContext(), TagView.STATE_NORMAL, tag);
         newTag.setOnClickListener(mInternalTagClickListener);
         addView(newTag);
+    }
+
+    private TextWatcher inputTextWatcher;
+
+    public TextWatcher getInputTextWatcher() {
+        return inputTextWatcher;
+    }
+
+    public void setInputTextWatcher(TextWatcher inputTextWatcher) {
+        this.inputTextWatcher = inputTextWatcher;
     }
 
     public float dp2px(float dp) {
@@ -591,6 +623,9 @@ public class TagGroup extends ViewGroup {
 
     protected void deleteTag(TagView tagView) {
         removeView(tagView);
+        if (MaxTagSize > 0 && getTagList().size() == MaxTagSize-1 ) {
+            appendInputTag();
+        }
         if (mOnTagChangeListener != null) {
             mOnTagChangeListener.onDelete(TagGroup.this, tagView.getText().toString());
         }
@@ -839,6 +874,18 @@ public class TagGroup extends ViewGroup {
             mCheckedMarkerPaint.setColor(checkedMarkerColor);
         }
 
+        public void OnSubmitTagClick(){
+            if (isInputAvailable()) {
+                // If the input content is available, end the input and dispatch
+                // the event, then append a new INPUT state tag.
+                endInput();
+                if (mOnTagChangeListener != null) {
+                    mOnTagChangeListener.onAppend(TagGroup.this, getText().toString());
+                }
+                appendInputTag();
+            }
+        }
+
 
         public TagView(Context context, final int state, CharSequence text) {
             super(context);
@@ -877,15 +924,7 @@ public class TagGroup extends ViewGroup {
                         if (actionId == EditorInfo.IME_NULL
                                 && (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER
                                 && event.getAction() == KeyEvent.ACTION_DOWN)) {
-                            if (isInputAvailable()) {
-                                // If the input content is available, end the input and dispatch
-                                // the event, then append a new INPUT state tag.
-                                endInput();
-                                if (mOnTagChangeListener != null) {
-                                    mOnTagChangeListener.onAppend(TagGroup.this, getText().toString());
-                                }
-                                appendInputTag();
-                            }
+                            OnSubmitTagClick();
                             return true;
                         }
                         return false;
